@@ -1,0 +1,39 @@
+version: '3.3'
+
+services:
+  web:
+    image: nginxproxy/nginx-proxy:alpine
+    restart: always
+    container_name: nginx-proxy
+    env_file:
+      - .env
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      DEFAULT_HOST: default
+      LETSENCRYPT_HOST: ${DOMAIN?Variable not set}
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+      - ./vhost.d:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+  acme:
+    image: nginxproxy/acme-companion
+    restart: always
+    container_name: nginx-acme
+    env_file:
+      - .env
+    environment:
+      DEFAULT_EMAIL: ${EMAIL?Variable not set}
+    volumes_from:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./acme:/etc/acme.sh
+
+networks:
+  default:
+    driver: bridge
+    name: web_proxy
+

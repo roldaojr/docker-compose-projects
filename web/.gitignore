@@ -1,0 +1,5 @@
+.env
+vhost.d/
+certs/
+html/
+acme/
