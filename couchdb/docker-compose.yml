@@ -1,0 +1,24 @@
+version: '3.3'
+
+services:
+  server:
+    image: couchdb:3
+    restart: always
+    environment:
+      VIRTUAL_HOST: "couchdb.${DOMAIN?Variable not set}"
+      VIRTUAL_PORT: 5984
+      LETSENCRYPT_HOST: "couchdb.${DOMAIN?Variable not set}"
+      COUCHDB_USER:
+      COUCHDB_PASSWORD:
+    volumes:
+      - data:/opt/couchdb/data
+    networks:
+      web_proxy:
+      default:
+
+networks:
+  web_proxy:
+    external: true
+
+volumes:
+  data:
